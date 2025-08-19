@@ -1,6 +1,7 @@
 package com.portal.jobportal.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,16 @@ public class UsersController {
 			
 		}
 		@PostMapping("/register/new")
-		public String userRegistration(@Valid Users users) {
+		public String userRegistration(@Valid Users users,Model model) {
+			Optional<Users> optionalUsers= usersService.getUserByEmail(users.getEmail());
+			 if(optionalUsers.isPresent()) {
+				 model.addAttribute("error","Email already registered,try to login or register with other email");
+				 List<UsersType> usersType=usersTypeService.getAll();
+					System.out.println("****Duplicate Email already present******");
+					model.addAttribute("getAllTypes",usersType);
+					model.addAttribute("user",new Users());
+					return "register";
+			 }
 			usersService.addNew(users);
 			return "dashboard";
 		}
